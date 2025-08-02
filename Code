@@ -1,0 +1,108 @@
+import turtle
+import pandas as pd
+
+data = [
+    {'Title': 'Inception', 'Type': 'Movie', 'Genre': 'Sci-Fi', 'Length': 'Long', 'Popularity': 'Blockbuster'},
+    {'Title': 'The Office', 'Type': 'Series', 'Genre': 'Comedy', 'Length': 'Medium', 'Popularity': 'Famous'},
+    {'Title': 'Dune', 'Type': 'Book', 'Genre': 'Sci-Fi', 'Length': 'Long', 'Popularity': 'Classic'},
+    {'Title': 'The Notebook', 'Type': 'Movie', 'Genre': 'Romance', 'Length': 'Medium', 'Popularity': 'Famous'},
+    {'Title': 'Brooklyn 99', 'Type': 'Series', 'Genre': 'Comedy', 'Length': 'Short', 'Popularity': 'Hidden Gem'},
+    {'Title': 'The Martian', 'Type': 'Book', 'Genre': 'Sci-Fi', 'Length': 'Medium', 'Popularity': 'Popular'},
+    {'Title': 'Parasite', 'Type': 'Movie', 'Genre': 'Thriller', 'Length': 'Medium', 'Popularity': 'Oscar Winner'},
+    {'Title': 'Sherlock', 'Type': 'Series', 'Genre': 'Mystery', 'Length': 'Medium', 'Popularity': 'Famous'},
+    {'Title': 'Pride and Prejudice', 'Type': 'Book', 'Genre': 'Romance', 'Length': 'Long', 'Popularity': 'Classic'},
+    {'Title': 'Breaking Bad', 'Type': 'Series', 'Genre': 'Drama', 'Length': 'Long', 'Popularity': 'Blockbuster'},
+    {'Title': 'Your Name', 'Type': 'Movie', 'Genre': 'Romance', 'Length': 'Short', 'Popularity': 'Hidden Gem'},
+    {'Title': 'Black Mirror', 'Type': 'Series', 'Genre': 'Sci-Fi', 'Length': 'Short', 'Popularity': 'Popular'},
+    {'Title': 'Gone Girl', 'Type': 'Book', 'Genre': 'Thriller', 'Length': 'Medium', 'Popularity': 'Popular'},
+    {'Title': 'The Godfather', 'Type': 'Movie', 'Genre': 'Drama', 'Length': 'Long', 'Popularity': 'Classic'},
+    {'Title': 'The Midnight Library', 'Type': 'Book', 'Genre': 'Fantasy', 'Length': 'Medium', 'Popularity': 'Popular'},
+    {'Title': 'Stranger Things', 'Type': 'Series', 'Genre': 'Sci-Fi', 'Length': 'Long', 'Popularity': 'Blockbuster'},
+    {'Title': 'The Crown', 'Type': 'Series', 'Genre': 'Historical', 'Length': 'Long', 'Popularity': 'Popular'},
+    {'Title': 'It Ends With Us', 'Type': 'Book', 'Genre': 'Romance', 'Length': 'Medium', 'Popularity': 'Trending'},
+    {'Title': 'Everything Everywhere All At Once', 'Type': 'Movie', 'Genre': 'Sci-Fi', 'Length': 'Long', 'Popularity': 'Oscar Winner'},
+    {'Title': 'The Alchemist', 'Type': 'Book', 'Genre': 'Philosophy', 'Length': 'Short', 'Popularity': 'Classic'},
+    {'Title': 'Ted Lasso', 'Type': 'Series', 'Genre': 'Comedy', 'Length': 'Medium', 'Popularity': 'Popular'},
+    {'Title': 'Interstellar', 'Type': 'Movie', 'Genre': 'Sci-Fi', 'Length': 'Long', 'Popularity': 'Famous'},
+    {'Title': '1984', 'Type': 'Book', 'Genre': 'Dystopian', 'Length': 'Medium', 'Popularity': 'Classic'},
+    {'Title': 'The Handmaid’s Tale', 'Type': 'Series', 'Genre': 'Dystopian', 'Length': 'Medium', 'Popularity': 'Famous'},
+    {'Title': 'Normal People', 'Type': 'Series', 'Genre': 'Romance', 'Length': 'Short', 'Popularity': 'Hidden Gem'}
+]
+
+df = pd.DataFrame(data)
+
+screen = turtle.Screen()
+screen.title("Smart Recommender")
+screen.bgcolor("#1e1e2f")
+pen = turtle.Turtle()
+pen.hideturtle()
+pen.color("white")
+pen.penup()
+
+
+def ask_input(prompt):
+    screen.clear()
+    screen.bgcolor("#1e1e2f")
+    pen.clear()
+    pen.goto(0, 0)
+    pen.write(prompt, align="center", font=("Arial", 16, "bold"))
+    return screen.textinput("Your Answer", prompt)
+
+def show_recommendations(titles):
+    screen.clear()
+    screen.bgcolor("#222244")
+    pen.clear()
+    pen.color("lightgreen")
+    pen.goto(0, 160)
+    pen.write("We Recommend:", align="center", font=("Arial", 18, "bold"))
+
+    y = 120
+    for title in titles:
+        pen.goto(0, y)
+        pen.write(f"• {title}", align="center", font=("Arial", 14, "normal"))
+        y -= 30
+
+    again = screen.textinput("Try Again?", "Would you like to try again? (yes/no): ")
+    return again and again.lower().startswith("y")
+
+
+def main():
+    while True:
+        content_type = ask_input("What would you like? (Movie, Series, Book)")
+        if not content_type: break
+        genre = ask_input("Genre? (Sci-Fi, Romance, Thriller, etc.)")
+        if not genre: break
+        length = ask_input("Preferred Length? (Short, Medium, Long)")
+        if not length: break
+        popularity = ask_input("Popularity? (Popular, Blockbuster, Hidden Gem, etc.)")
+        if not popularity: break
+
+        results = df[
+            (df['Type'].str.lower() == content_type.lower()) &
+            (df['Genre'].str.lower() == genre.lower()) &
+            (df['Length'].str.lower() == length.lower()) &
+            (df['Popularity'].str.lower().str.contains(popularity.lower()))
+        ]
+
+        if results.empty:
+            pen.clear()
+            screen.bgcolor("darkred")
+            pen.goto(0, 0)
+            pen.write(" No matches found!", align="center", font=("Arial", 16, "bold"))
+            again = screen.textinput("Try Again?", "Would you like to try again? (yes/no): ")
+            if not (again and again.lower().startswith("y")):
+                break
+        else:
+            titles = results['Title'].tolist()
+            if not show_recommendations(titles):
+                break
+
+    pen.clear()
+    screen.bgcolor("black")
+    pen.color("white")
+    pen.goto(0, 0)
+    pen.write(" Enjoy! Closing...", align="center", font=("Arial", 16, "bold"))
+    turtle.done()
+
+
+main()
